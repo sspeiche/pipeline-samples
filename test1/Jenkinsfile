@@ -1,0 +1,10 @@
+node {
+   stage 'Validate PR'
+   echo 'Validating PR...'
+
+   stage 'Build'
+   sh 'echo "Building..." && sleep 7 && echo "Promoting to test..."'
+
+   stage 'Test'
+   sh 'echo "Running automated tests..." && sleep 17 && exit 0'
+}
