@@ -1,0 +1,20 @@
+node() {
+  stage "Validate PR"
+  echo "Validating PR..."
+  sleep 6
+
+  stage 'Build'
+  openShiftBuild(buildConfig: 'nodejs-mongodb-example', showBuildLogs: 'true')
+
+  stage 'Test'
+  echo "Testing..."
+  sleep 7
+
+  stage 'Staging'
+  openShiftDeploy(deploymentConfig: 'nodejs-mongodb-example')
+
+  stage 'UAT'
+  echo "Deploying to UAT"
+  sleep 11
+
+}
