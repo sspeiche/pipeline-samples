@@ -1,0 +1,72 @@
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "pipeline-enable",
+    "creationTimestamp": null,
+    "annotations": {
+      "description": "Pipeline enable an existing DeploymentConfig",
+      "iconClass": "icon-jenkins",
+      "tags": "instant-app,jenkins"
+    }
+  },
+  "objects": [
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "pipeline",
+        "annotations": {
+          "pipeline.alpha.openshift.io/uses": "[{\"name\": \"${DEPLOYMENT_CONFIG_NAME}\", \"namespace\": \"\", \"kind\": \"DeploymentConfig\"}]"
+        },
+        "labels": {
+          "name": "pipeline"
+        }
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "secret101"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "secret101"
+            }
+          }
+        ],
+        "strategy": {
+          "type": "JenkinsPipeline",
+          "jenkinsPipelineStrategy": {
+            "jenkinsfile": "node('${JENKINS_SLAVE}') {\nstage 'Build'\nopenshiftBuild(buildConfig: '${BUILD_CONFIG_NAME}', showBuildLogs: 'true')\nstage 'Deploy'\nopenshiftDeploy(deploymentConfig: '${DEPLOYMENT_CONFIG_NAME}')\n}"
+          }
+        }
+      }
+    }
+  ],
+    "parameters" : [
+    {
+      "name": "BUILD_CONFIG_NAME",
+      "displayName": "Application Build Config Name",
+      "description": "The name of the OpenShift BuildConfig you want the pipeline to build.",
+      "required": true
+    },
+    {
+      "name": "DEPLOYMENT_CONFIG_NAME",
+      "displayName": "Application Deployment Config Name",
+      "description": "The name of the OpenShift DeploymentConfig you want to associate the pipeline with.",
+      "required" : true
+    },
+    {
+      "name": "JENKINS_SLAVE",
+      "displayName": "Jenkins target slave node",
+      "description": "Jenkins slaves can be targeted to certain slave node types, such as 'maven'."
+    }
+  ],
+  "labels": {
+    "template": "application-pipeline-template"
+  }
+}
